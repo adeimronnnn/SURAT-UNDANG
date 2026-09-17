@@ -17,7 +17,7 @@
 
         html, body {
             width: 100%;
-            height: 100%;
+            height: 100svh; 
             font-family: 'Cormorant Garamond', serif;
             color: #3a3d35;
             background-color: #F8F6F0; 
@@ -41,7 +41,7 @@
 
         .app-container {
             width: 100vw;
-            height: 100vh;
+            height: 100svh;
             background: #F8F6F0;
             position: relative;
             overflow: hidden;
@@ -196,7 +196,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            padding: 40px 20px 100px 20px; 
+            padding: 40px 20px 120px 20px; 
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -389,24 +389,36 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
+        /* BOTTOM NAV: DISEMBUNYIKAN SEBELUM BUKA UNDANGAN */
         .bottom-nav {
-            position: absolute;
-            bottom: 20px;
+            position: fixed;
+            bottom: calc(25px + env(safe-area-inset-bottom));
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(232, 227, 213, 0.94);
+            background: rgba(232, 227, 213, 0.96);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            padding: 8px 12px;
+            padding: 8px 10px;
             border-radius: 40px;
-            display: flex;
+            display: none; /* Disembunyikan dulu */
             gap: 4px;
-            box-shadow: 0 10px 30px rgba(107, 112, 92, 0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             border: 1px solid #A3A995;
-            z-index: 900;
-            width: calc(100% - 30px);
-            max-width: 480px;
+            z-index: 9999;
+            width: calc(100% - 32px);
+            max-width: 450px;
             justify-content: space-around;
+        }
+
+        /* CLASS UNTUK MENAMPILKAN NAVBAR DENGAN EFEK FADE IN */
+        .bottom-nav.show {
+            display: flex;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
         }
 
         .nav-btn {
@@ -444,14 +456,14 @@
         .nav-btn:hover:not(.active) { opacity: 1; }
 
         @media (min-width: 600px) {
-            .page { padding: 50px 40px 110px 40px; }
+            .page { padding: 50px 40px 130px 40px; }
             .guest-list { grid-template-columns: repeat(3, 1fr); }
             .nav-btn i { font-size: 1.05rem; }
             .nav-btn span { font-size: 0.75rem; }
         }
 
         @media (min-width: 992px) {
-            .page { padding: 60px 80px 120px 80px; }
+            .page { padding: 60px 80px 130px 80px; }
             .guest-list { grid-template-columns: repeat(4, 1fr); gap: 12px 20px; }
             .cards-wrapper-desktop {
                 display: flex;
@@ -630,8 +642,7 @@
                 <p style="font-size: clamp(0.95rem, 1.5vw, 1.15rem); color: #555;">Scan QR Code di bawah ini untuk melihat rute via Google Maps:</p>
                 
                 <div class="barcode-container">
-                    <img src="barcode-kamu.jpg" alt="Barcode Lokasi" class="barcode-img">
-                    <span id="barcode-placeholder" style="display: block; text-align: center; padding: 10px;">Tempat<br>Barcode<br>(Ganti link src)</span>
+                    <img src="Link QR.jpg" alt="Barcode Lokasi" class="barcode-img" style="display: block;">
                 </div>
             </div>
 
@@ -669,7 +680,7 @@
 
         </div>
 
-        <div class="bottom-nav">
+        <div class="bottom-nav" id="main-nav">
             <button class="nav-btn active" onclick="switchPage(1)">
                 <i class="fas fa-home"></i>
                 <span>Utama</span>
@@ -707,7 +718,6 @@
                 document.getElementById('nama-tamu').textContent = formattedName;
             }
 
-            // --- KODE PEMBERSIH TULISAN index.html ---
             if (window.location.pathname.endsWith('/index.html')) {
                 const newUrl = window.location.href.replace('/index.html', '/');
                 window.history.replaceState(null, '', newUrl);
@@ -718,6 +728,7 @@
 
         function bukaUndangan() {
             document.getElementById("cover").classList.add("slide-out");
+            document.getElementById("main-nav").classList.add("show");
             playMusic();
         }
 
