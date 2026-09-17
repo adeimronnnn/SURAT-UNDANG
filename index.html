@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undangan Pernikahan - Santika & Febri</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Cormorant Garamond', serif;
+            color: #3a3d35;
+            background-color: #F8F6F0; 
+            overflow: hidden;
+            font-size: 18px;
+        }
+
+        .font-aesthetic {
+            font-family: 'Great Vibes', cursive;
+            color: #6B705C; 
+            font-weight: normal;
+        }
+
+        h2.section-title {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(3rem, 6vw, 4.5rem);
+            color: #6B705C; 
+            margin-bottom: 15px;
+            font-weight: normal;
+        }
+
+        .app-container {
+            width: 100vw;
+            height: 100vh;
+            background: #F8F6F0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #falling-leaves-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 15;
+        }
+
+        .botanical-corner {
+            position: absolute;
+            width: clamp(140px, 22vw, 240px);
+            height: clamp(140px, 22vw, 240px);
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.45;
+            transition: all 0.8s ease;
+        }
+
+        .corner-top-left {
+            top: -10px;
+            left: -10px;
+        }
+
+        .corner-bottom-right {
+            bottom: -10px;
+            right: -10px;
+            transform: rotate(180deg);
+        }
+
+        @keyframes sway {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(4deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .page.active .botanical-corner.corner-top-left svg {
+            animation: sway 7s ease-in-out infinite;
+            transform-origin: top left;
+        }
+
+        .wreath-wrapper {
+            position: relative;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+            margin: 10px 0;
+        }
+
+        .wreath-svg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.35;
+        }
+
+        #cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6B705C, #3a3d35);
+            color: #F8F6F0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: transform 1s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.8s ease;
+            padding: 20px;
+            text-align: center;
+        }
+
+        #cover.slide-out {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .cover-floral {
+            position: absolute;
+            width: clamp(160px, 25vw, 280px);
+            opacity: 0.25;
+            pointer-events: none;
+        }
+
+        .cover-floral-tl { top: 0; left: 0; }
+        .cover-floral-br { bottom: 0; right: 0; transform: rotate(180deg); }
+
+        .guest-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #ffffff;
+            margin: 15px 0 30px 0;
+            padding: 8px 30px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            min-width: 220px;
+        }
+
+        .btn-buka {
+            padding: 12px 36px;
+            background-color: #6B705C;
+            color: #F8F6F0;
+            border: none;
+            border-radius: 35px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1rem, 1.6vw, 1.2rem);
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        .btn-buka:hover {
+            background-color: #545848;
+            transform: scale(1.05);
+        }
+
+        .pages-wrapper {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #F8F6F0;
+        }
+
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 40px 20px 100px 20px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.95);
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            overflow-y: auto;
+        }
+
+        .page.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+
+        .wedding-ornament {
+            color: #A3A995;
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            letter-spacing: 10px;
+            margin: 10px 0;
+        }
+
+        .couple-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(2.5rem, 5vw, 3.8rem);
+            color: #6B705C;
+            margin: 0;
+            font-weight: normal;
+            line-height: 1.2;
+        }
+
+        .parents-name {
+            font-size: clamp(0.95rem, 1.5vw, 1.2rem);
+            color: #555;
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .ampersand {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(2.2rem, 4vw, 3.2rem);
+            color: #A3A995;
+            margin: 5px 0;
+        }
+
+        .card {
+            background: #E8E3D5;
+            padding: clamp(20px, 3.5vw, 32px);
+            border-radius: 16px;
+            margin: 12px 0;
+            width: 100%;
+            max-width: 650px;
+            border: 1px solid #A3A995;
+            box-shadow: 0 4px 12px rgba(107, 112, 92, 0.05);
+            position: relative;
+            z-index: 5;
+        }
+        
+        .card-title {
+             color: #6B705C;
+             font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+             margin-bottom: 8px;
+             font-weight: 700;
+             letter-spacing: 1.5px;
+        }
+
+        .card-text {
+            font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+            color: #4a4d43;
+            line-height: 1.6;
+        }
+
+        .guest-list-container {
+            margin-top: 25px;
+            text-align: left;
+            width: 100%;
+            max-width: 750px;
+            position: relative;
+            z-index: 5;
+        }
+        
+        .guest-list-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #6B705C;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 1px solid #A3A995;
+            padding-bottom: 8px;
+        }
+
+        .guest-list {
+            list-style-type: none;
+            padding: 0;
+            font-size: clamp(0.9rem, 1.4vw, 1.1rem);
+            color: #4a4d43;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px 15px;
+        }
+        
+        .guest-list li {
+            padding-left: 14px;
+            position: relative;
+        }
+
+        .guest-list li::before {
+            content: "•";
+            color: #6B705C;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .closing-text {
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            color: #555;
+            margin-top: 25px;
+            line-height: 1.6;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .barcode-container {
+            margin-top: 20px;
+            width: clamp(160px, 20vw, 220px);
+            height: clamp(160px, 20vw, 220px);
+            border: 2px dashed #6B705C;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #6B705C;
+            font-size: 0.95rem;
+            background-color: #E8E3D5;
+            position: relative;
+            z-index: 5;
+        }
+        
+        .barcode-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none;
+            border-radius: 8px;
+        }
+
+        .btn-copy {
+            margin-top: 12px;
+            padding: 8px 18px;
+            background-color: #6B705C;
+            color: #F8F6F0;
+            border: none;
+            border-radius: 20px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-copy:hover {
+            background-color: #545848;
+            transform: scale(1.03);
+        }
+
+        .audio-control {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            width: 42px;
+            height: 42px;
+            background: #6B705C;
+            color: #F8F6F0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 950;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(232, 227, 213, 0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 8px 12px;
+            border-radius: 40px;
+            display: flex;
+            gap: 4px;
+            box-shadow: 0 10px 30px rgba(107, 112, 92, 0.2);
+            border: 1px solid #A3A995;
+            z-index: 900;
+            width: calc(100% - 30px);
+            max-width: 480px;
+            justify-content: space-around;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #6B705C;
+            padding: 6px 8px;
+            border-radius: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            flex: 1;
+            opacity: 0.75;
+        }
+
+        .nav-btn i { font-size: 0.95rem; transition: transform 0.3s ease; }
+        .nav-btn span {
+            font-size: 0.7rem;
+            font-weight: 600;
+            font-family: 'Cormorant Garamond', serif;
+            letter-spacing: 0.3px;
+        }
+
+        .nav-btn.active {
+            color: #F8F6F0;
+            background: #6B705C;
+            box-shadow: 0 4px 12px rgba(107, 112, 92, 0.35);
+            opacity: 1;
+        }
+        .nav-btn.active i { transform: scale(1.1); }
+        .nav-btn:hover:not(.active) { opacity: 1; }
+
+        @media (min-width: 600px) {
+            .page { padding: 50px 40px 110px 40px; }
+            .guest-list { grid-template-columns: repeat(3, 1fr); }
+            .nav-btn i { font-size: 1.05rem; }
+            .nav-btn span { font-size: 0.75rem; }
+        }
+
+        @media (min-width: 992px) {
+            .page { padding: 60px 80px 120px 80px; }
+            .guest-list { grid-template-columns: repeat(4, 1fr); gap: 12px 20px; }
+            .cards-wrapper-desktop {
+                display: flex;
+                gap: 25px;
+                width: 100%;
+                max-width: 900px;
+                justify-content: center;
+            }
+            .cards-wrapper-desktop .card { flex: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <canvas id="falling-leaves-canvas"></canvas>
+
+        <audio id="bg-music" loop>
+            <source src="Sabilulungan.mp3" type="audio/mpeg">
+        </audio>
+
+        <div class="audio-control" onclick="toggleMusic()">
+            <i id="music-icon" class="fas fa-music"></i>
+        </div>
+
+        <div class="botanical-corner corner-top-left">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 10C50 80 120 120 190 130" stroke="#6B705C" stroke-width="2" stroke-linecap="round"/>
+                <path d="M40 35C25 20 10 30 15 45C30 45 40 35 40 35Z" fill="#6B705C"/>
+                <path d="M70 58C60 38 40 45 50 65C65 62 70 58 70 58Z" fill="#A3A995"/>
+                <path d="M105 82C100 60 75 70 85 90C100 87 105 82 105 82Z" fill="#6B705C"/>
+                <path d="M140 102C140 80 115 85 125 108C138 107 140 102 140 102Z" fill="#A3A995"/>
+            </svg>
+        </div>
+        <div class="botanical-corner corner-bottom-right">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 10C50 80 120 120 190 130" stroke="#6B705C" stroke-width="2" stroke-linecap="round"/>
+                <path d="M40 35C25 20 10 30 15 45C30 45 40 35 40 35Z" fill="#6B705C"/>
+                <path d="M70 58C60 38 40 45 50 65C65 62 70 58 70 58Z" fill="#A3A995"/>
+            </svg>
+        </div>
+
+        <div id="cover">
+            <svg class="cover-floral cover-floral-tl" viewBox="0 0 200 200" fill="none">
+                <path d="M20 20C80 80 140 100 190 110" stroke="#F8F6F0" stroke-width="2"/>
+                <path d="M50 40C30 20 20 40 35 55C50 50 50 40 50 40Z" fill="#F8F6F0"/>
+                <path d="M90 65C70 45 55 65 75 80C90 75 90 65 90 65Z" fill="#F8F6F0"/>
+            </svg>
+            <svg class="cover-floral cover-floral-br" viewBox="0 0 200 200" fill="none">
+                <path d="M20 20C80 80 140 100 190 110" stroke="#F8F6F0" stroke-width="2"/>
+                <path d="M50 40C30 20 20 40 35 55C50 50 50 40 50 40Z" fill="#F8F6F0"/>
+            </svg>
+
+            <p style="letter-spacing: 4px; font-size: clamp(0.85rem, 1.6vw, 1.15rem); text-transform: uppercase;">UNDANGAN PERNIKAHAN</p>
+            <h1 class="font-aesthetic" style="font-size: clamp(4rem, 8.5vw, 6.5rem); margin: 15px 0; color: #F8F6F0;">Santika & Febri</h1>
+            
+            <p style="font-size: clamp(0.95rem, 1.5vw, 1.2rem); margin-top: 10px;">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+            
+            <div class="guest-name">
+                <span id="nama-tamu">Keluarga besar Shopee Ciampea 4 HUB</span>
+            </div>
+            
+            <button class="btn-buka" onclick="bukaUndangan()">
+                <i class="fas fa-envelope-open"></i> Buka Undangan
+            </button>
+        </div>
+
+        <div class="pages-wrapper">
+
+            <div class="page active" id="page-1" style="justify-content: center;">
+                <p style="text-transform: uppercase; letter-spacing: 5px; font-size: clamp(0.85rem, 1.5vw, 1.15rem); color: #6B705C; font-weight: 600;">The Wedding Of</p>
+                
+                <div class="wreath-wrapper">
+                    <svg class="wreath-svg" viewBox="0 0 300 300" fill="none">
+                        <circle cx="150" cy="150" r="130" stroke="#6B705C" stroke-width="1.5" stroke-dasharray="6 6"/>
+                        <circle cx="150" cy="150" r="140" stroke="#A3A995" stroke-width="1"/>
+                        <path d="M40 120C20 100 30 80 50 90C55 110 40 120 40 120Z" fill="#6B705C"/>
+                        <path d="M260 180C280 200 270 220 250 210C245 190 260 180 260 180Z" fill="#6B705C"/>
+                    </svg>
+                    
+                    <h1 class="font-aesthetic" style="font-size: clamp(4.5rem, 9.5vw, 7.5rem); line-height: 1; position: relative; z-index: 2;">Santika <br><span style="font-size: clamp(2.5rem, 5vw, 4rem);">&</span><br> Febri</h1>
+                </div>
+
+                <div class="wedding-ornament">❖ ❦ ❖</div>
+
+                <p style="font-size: clamp(1.2rem, 2.2vw, 1.6rem); color: #6B705C; margin-top: 10px; font-weight: 600; letter-spacing: 2px;">
+                    Minggu, 20 September 2026
+                </p>
+            </div>
+
+            <div class="page" id="page-2">
+                <p style="font-size: clamp(0.95rem, 1.6vw, 1.2rem); margin-bottom: 25px; color: #4a4d43; line-height: 1.6; max-width: 800px; font-style: italic;">
+                    Maha Suci Allah SWT yang telah menciptakan makhluk-Nya berpasang-pasangan.<br>
+                    Ya Allah, perkenankanlah kami menikahkan putra putri kami:
+                </p>
+                
+                <div>
+                    <h3 class="couple-name">Santika Maulia</h3>
+                    <p class="parents-name">Keluarga Bpk Alm Sanusi & Ibu Yanti</p>
+                </div>
+
+                <div class="ampersand">&</div>
+
+                <div>
+                    <h3 class="couple-name">M. Febriyansyah</h3>
+                    <p class="parents-name">Keluarga Bpk Adon & Ibu Emul</p>
+                </div>
+                
+                <div class="guest-list-container">
+                    <h3 class="guest-list-title">"Turut Mengundang"</h3>
+                    <ul class="guest-list">
+                        <li>Anjar (Kakanda)</li>
+                        <li>Tomi, Ian</li>
+                        <li>Agung, Andre</li>
+                        <li>Oman, Roni</li>
+                        <li>Amil, Mia</li>
+                        <li>Novi</li>
+                        <li>Ridwan</li>
+                        <li>Adelia</li>
+                        <li>Adila, Lusi</li>
+                        <li>Fahri Al Akbar</li>
+                        <li>Animan Ajis</li>
+                        <li>Suhandi/Endi</li>
+                        <li>Pemuda/i Cinangka Kaum</li>
+                        <li>Alumni Mi Nurul Falah</li>
+                        <li>Alumni SMP Cendekia</li>
+                        <li>Alumni SMP Nidaul Ummah</li>
+                        <li>Alumni SDN Cinangka 01</li>
+                        <li>Alumni MTS Tarbiyatul Fallah</li>
+                        <li>Alumni SMK Putra Pelita</li>
+                    </ul>
+
+                    <p class="closing-text">
+                        Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu kepada mempelai.
+                    </p>
+                </div>
+            </div>
+
+            <div class="page" id="page-3" style="justify-content: center;">
+                <h2 class="section-title">Rangkaian Acara</h2>
+
+                <div class="cards-wrapper-desktop">
+                    <div class="card">
+                        <h3 class="card-title">AKAD NIKAH</h3>
+                        <p class="card-text">
+                            <strong>Minggu, 20 September 2026</strong><br>
+                            Pukul 09.00 WIB s/d Selesai<br>
+                            Tempat: Kediaman Mempelai Wanita
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">RESEPSI</h3>
+                        <p class="card-text">
+                            <strong>Minggu, 20 September 2026</strong><br>
+                            Pukul 09.00 WIB s/d Selesai<br>
+                            Kp. Tugu Batas RT 003/002, Desa Cinangka Kec.Ciampea, Kab.Bogor
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page" id="page-4" style="justify-content: center;">
+                <h2 class="section-title">Lokasi Acara</h2>
+                
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3 class="card-title" style="font-size: clamp(1.2rem, 2.2vw, 1.5rem);">Alamat Lengkap</h3>
+                    <p class="card-text">
+                        Kp. Tugu Batas RT 003/002<br>
+                        Desa Cinangka Kec.Ciampea<br>
+                        Kab.Bogor
+                    </p>
+                </div>
+                
+                <p style="font-size: clamp(0.95rem, 1.5vw, 1.15rem); color: #555;">Scan QR Code di bawah ini untuk melihat rute via Google Maps:</p>
+                
+                <div class="barcode-container">
+                    <img src="barcode-kamu.jpg" alt="Barcode Lokasi" class="barcode-img">
+                    <span id="barcode-placeholder" style="display: block; text-align: center; padding: 10px;">Tempat<br>Barcode<br>(Ganti link src)</span>
+                </div>
+            </div>
+
+            <div class="page" id="page-5" style="justify-content: center;">
+                <h2 class="section-title">Wedding Gift</h2>
+                
+                <p style="font-size: clamp(0.95rem, 1.5vw, 1.15rem); color: #555; margin-bottom: 15px; max-width: 650px; line-height: 1.6;">
+                    Bagi yang berkenan memberikan tanda kasih, dapat melalui transfer Bank BCA atau E-Wallet DANA di bawah ini:
+                </p>
+
+                <div class="cards-wrapper-desktop">
+                    <div class="card">
+                        <h3 class="card-title"><i class="fas fa-credit-card"></i> BANK BCA</h3>
+                        <p class="card-text">
+                            No. Rekening: <strong id="rek-bca">5737186011</strong><br>
+                            a.n. Febriyansyah
+                        </p>
+                        <button class="btn-copy" onclick="copyToClipboard('5737186011', 'No. Rekening BCA')">
+                            <i class="fas fa-copy"></i> Salin No. Rekening
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title"><i class="fas fa-wallet"></i> DANA</h3>
+                        <p class="card-text">
+                            No. DANA: <strong id="rek-dana">085718487236</strong><br>
+                            a.n. Santika
+                        </p>
+                        <button class="btn-copy" onclick="copyToClipboard('085718487236', 'No. DANA')">
+                            <i class="fas fa-copy"></i> Salin No. DANA
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="bottom-nav">
+            <button class="nav-btn active" onclick="switchPage(1)">
+                <i class="fas fa-home"></i>
+                <span>Utama</span>
+            </button>
+            <button class="nav-btn" onclick="switchPage(2)">
+                <i class="fas fa-heart"></i>
+                <span>Mempelai</span>
+            </button>
+            <button class="nav-btn" onclick="switchPage(3)">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Acara</span>
+            </button>
+            <button class="nav-btn" onclick="switchPage(4)">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Lokasi</span>
+            </button>
+            <button class="nav-btn" onclick="switchPage(5)">
+                <i class="fas fa-gift"></i>
+                <span>Hadiah</span>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const music = document.getElementById("bg-music");
+        let isPlaying = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const namaTamu = urlParams.get('to');
+            
+            if (namaTamu) {
+                const formattedName = namaTamu.replace(/[-_]/g, ' ');
+                document.getElementById('nama-tamu').textContent = formattedName;
+            }
+
+            // --- KODE PEMBERSIH TULISAN index.html ---
+            if (window.location.pathname.endsWith('/index.html')) {
+                const newUrl = window.location.href.replace('/index.html', '/');
+                window.history.replaceState(null, '', newUrl);
+            }
+
+            initFallingLeaves();
+        });
+
+        function bukaUndangan() {
+            document.getElementById("cover").classList.add("slide-out");
+            playMusic();
+        }
+
+        function playMusic() {
+            music.play();
+            isPlaying = true;
+            document.getElementById("music-icon").className = "fas fa-pause";
+        }
+
+        function toggleMusic() {
+            if (isPlaying) {
+                music.pause();
+                document.getElementById("music-icon").className = "fas fa-music";
+            } else {
+                music.play();
+                document.getElementById("music-icon").className = "fas fa-pause";
+            }
+            isPlaying = !isPlaying;
+        }
+
+        function switchPage(pageIndex) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(`page-${pageIndex}`).classList.add('active');
+            navBtns[pageIndex - 1].classList.add('active');
+        }
+
+        function copyToClipboard(text, type) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert(type + ' berhasil disalin!');
+            }, function(err) {
+                console.error('Gagal menyalin: ', err);
+            });
+        }
+
+        function initFallingLeaves() {
+            const canvas = document.getElementById('falling-leaves-canvas');
+            const ctx = canvas.getContext('2d');
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const leaves = [];
+            const leafColors = ['rgba(107, 112, 92, ', 'rgba(163, 169, 149, '];
+
+            for (let i = 0; i < 22; i++) {
+                leaves.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    size: Math.random() * 8 + 6,
+                    speedY: Math.random() * 1.2 + 0.6,
+                    speedX: Math.random() * 0.8 - 0.4,
+                    angle: Math.random() * 360,
+                    spin: Math.random() * 0.03 - 0.015,
+                    color: leafColors[Math.floor(Math.random() * leafColors.length)],
+                    opacity: Math.random() * 0.18 + 0.12
+                });
+            }
+
+            function drawLeaf(leaf) {
+                ctx.save();
+                ctx.translate(leaf.x, leaf.y);
+                ctx.rotate(leaf.angle);
+                ctx.fillStyle = leaf.color + leaf.opacity + ')';
+                
+                ctx.beginPath();
+                ctx.moveTo(0, -leaf.size);
+                ctx.quadraticCurveTo(leaf.size / 2, 0, 0, leaf.size);
+                ctx.quadraticCurveTo(-leaf.size / 2, 0, 0, -leaf.size);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function animateLeaves() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                leaves.forEach(leaf => {
+                    leaf.y += leaf.speedY;
+                    leaf.x += Math.sin(leaf.y * 0.01) * 0.8 + leaf.speedX;
+                    leaf.angle += leaf.spin;
+
+                    if (leaf.y > canvas.height + 20) {
+                        leaf.y = -20;
+                        leaf.x = Math.random() * canvas.width;
+                    }
+
+                    drawLeaf(leaf);
+                });
+
+                requestAnimationFrame(animateLeaves);
+            }
+
+            animateLeaves();
+        }
+    </script>
+</body>
+</html>
